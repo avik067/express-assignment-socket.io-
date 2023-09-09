@@ -13,7 +13,9 @@ const  port  =  process.env.PORT || 4000 ;
 const http = require('http').Server(app) ///// 
 
 
-app.use(cors())
+app.use(cors({
+  origin: "*"
+}))
 app.use(express.json())
 // console.log(randomName)
 ////////////////////////////// http server + -> socket.io

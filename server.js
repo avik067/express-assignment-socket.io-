@@ -27,24 +27,21 @@ const io = require ('socket.io')(http,{
 }) ;
 /////////////////////////////////////////////////
 
-
-
 ///////////////////////////////// listening to app 
 // app.listen(port,()=> {  // we wont be listening to the app directly , we will now listen via io inside which we have create socket server 
 //   console.log(`Node is running : ${port}`) ;
 // })
-////////////////////////////////// Home route
+////////////////////////////////// Mongo Link
 
 mongoose.connect(process.env.SECRET_MONGO_LINK)
 .then(()=>{
-  
     console.log("data base connected")
 }).catch((e) => {
    console.log(e)
 })
 
 
-
+/////////////////////////////////////////////////////
 app.get('/', function (req, res) {
   res.send('A small backend application which can generate and emit an encrypted data stream over a socket !!! Live 😃 ')
 })
@@ -63,30 +60,29 @@ io.on('connection', socket => {
       
       socket.on("new-message" ,async(msg)=> {
       
-      console.log(`from client : ${msg}`)
-      const a  =  Math.ceil(Math.random()*100)
-      const b  =  Math.ceil(Math.random()*100)
-      console.log(a,b)
-      const newOb = {"name":randomName.names[a],"place":randomName.cities[b],"data":msg}
-       const newObString = JSON.stringify(newOb)
-      try {
-        const ch = await Chat.create(newOb) 
-        console.log(ch)
-        socket.emit("message-back",JSON.stringify(newOb))
-     }catch(err) {
-         console.log(err)
-         socket.emit("message-back",`Error : ${err}`)
-     }
-  })
+            console.log(`from client : ${msg}`)
+            const a  =  Math.ceil(Math.random()*100)
+            const b  =  Math.ceil(Math.random()*100)
+            console.log(a,b)
+            const newOb = {"name":randomName.names[a],"place":randomName.cities[b],"data":msg}
+            const newObString = JSON.stringify(newOb)
+            try {
+              const ch = await Chat.create(newOb) 
+              console.log(ch)
+              socket.emit("message-back",JSON.stringify(newOb))
+              socket.broadcast.emit("message-back",JSON.stringify(newOb))
+          }catch(err) {
+              console.log(err)
+              socket.emit("message-back",`Error : ${err}`)
+          }
+    })
      
-      socket.emit("server","Received by the server")
+    socket.emit("server","Received by the server")
       
 
-    })
+ })
 
 ////////////////////////////////
-
-
 
 http.listen(port,()=> {
   console.log(`Node is running : ${port}`) ;

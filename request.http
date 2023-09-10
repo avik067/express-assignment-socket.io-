@@ -3,7 +3,3 @@ GET http://localhost:5005/getsort
 
 ### 
 
-
-GET http://localhost:5005/getsortauto
-
-### 

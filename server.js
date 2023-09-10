@@ -42,9 +42,24 @@ mongoose.connect(process.env.SECRET_MONGO_LINK)
 
 
 /////////////////////////////////////////////////////
-app.get('/', function (req, res) {
+app.get('/', function  (req, res) {
   res.send('A small backend application which can generate and emit an encrypted data stream over a socket !!! Live 😃 ')
 })
+
+app.get('/getsort', async function  (req, res) {
+  
+  try {
+    const ch = await Chat.find({}).sort({createdAt:-1 }).limit(5) ;
+    res.status(200).json(ch)
+  }
+  catch(err) {
+    console.log(err)
+    socket.emit("message-back",`Error : ${err}`)
+  }
+
+
+})
+
 
 //////////////////////////////// connection
 
@@ -52,7 +67,7 @@ io.on('connection', socket => {
       //  console.log(socket)
       // console.log(socket.id)
       
-      console.log("a user is connected")
+      console.log(`a user is connected : ${socket.id}`)
 
       socket.on('disconnect',()=> {
         console.log("user disconnected")
@@ -61,16 +76,17 @@ io.on('connection', socket => {
       socket.on("new-message" ,async(msg)=> {
       
             console.log(`from client : ${msg}`)
-            const a  =  Math.ceil(Math.random()*100)
-            const b  =  Math.ceil(Math.random()*100)
+            const a  =  Math.ceil(Math.random()*99)
+            const b  =  Math.ceil(Math.random()*99)
             console.log(a,b)
             const newOb = {"name":randomName.names[a],"place":randomName.cities[b],"data":msg}
             const newObString = JSON.stringify(newOb)
             try {
               const ch = await Chat.create(newOb) 
               console.log(ch)
+              
+              socket.broadcast.emit("broadcast",JSON.stringify(newOb))
               socket.emit("message-back",JSON.stringify(newOb))
-              socket.broadcast.emit("message-back",JSON.stringify(newOb))
           }catch(err) {
               console.log(err)
               socket.emit("message-back",`Error : ${err}`)

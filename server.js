@@ -47,7 +47,8 @@ app.get('/', function  (req, res) {
 app.get('/getsort', async function  (req, res) {
   
   try {
-    const ch = await Chat.find({}).sort({createdAt:-1 }).limit(8) ;
+    const ch = await Chat.aggregate([{$sort:{createdAt:-1}},{$limit:8}]);
+    // const ch = await Chat.find({}).sort({createdAt:-1 }).limit(8) ;
     res.status(200).json(ch)
   }
   catch(err) {

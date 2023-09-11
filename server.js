@@ -12,14 +12,12 @@ const  port  =  process.env.PORT || 4000 ;
 
 const http = require('http').Server(app) ///// 
 
-
 app.use(cors({
   origin: "*"
 }))
 app.use(express.json())
 // console.log(randomName)
 ////////////////////////////// http server + -> socket.io
-
 const io = require ('socket.io')(http,{
   cors: {
     origin: "*"
@@ -79,7 +77,7 @@ io.on('connection', socket => {
             const a  =  Math.ceil(Math.random()*99)
             const b  =  Math.ceil(Math.random()*99)
             console.log(a,b)
-            const newOb = {"name":randomName.names[a],"place":randomName.cities[b],"data":msg}
+            const newOb = {"name":randomName.names[a],"place":randomName.cities[b],"data":msg, "date":new Date().toISOString()}
             const newObString = JSON.stringify(newOb)
             try {
               const ch = await Chat.create(newOb) 
